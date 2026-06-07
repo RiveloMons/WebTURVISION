@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TURVISION — SEE BEYOND</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --black: #050505;
+      --white: #f0ede8;
+      --red: #c0161b;
+      --red-dark: #7a0b0e;
+      --grey: #1a1a1a;
+      --grey-mid: #2e2e2e;
+      --grey-light: #5a5a5a;
+      --accent: #c0161b;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Barlow Condensed', sans-serif;
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--red); }
+
+    /* ══════════════════════════════════════
+       NAV
+    ══════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: linear-gradient(to bottom, rgba(5,5,5,0.98), transparent);
+      mix-blend-mode: normal;
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.3em;
+      color: var(--white);
+      text-decoration: none;
+      position: relative;
+    }
+    .nav-logo span { color: var(--red); }
+    .nav-logo::after {
+      content: '◎';
+      font-size: 0.6rem;
+      position: absolute;
+      top: 4px; right: -16px;
+      color: var(--red);
+      animation: blink 2s infinite;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey-light);
+      text-decoration: none;
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 0; height: 1px;
+      background: var(--red);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cart {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: var(--white);
+      text-decoration: none;
+      border: 1px solid var(--red);
+      padding: 8px 16px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-cart:hover { background: var(--red); color: var(--white); }
+
+    /* ══════════════════════════════════════
+       HERO
+    ══════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Red diagonal slash */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -20%; right: 30%;
+      width: 2px;
+      height: 140%;
+      background: var(--red);
+      transform: rotate(-15deg);
+      opacity: 0.3;
+      transform-origin: top;
+    }
+
+    .hero-text {
+      padding: 120px 48px 80px 48px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 10vw, 9rem);
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.4s forwards;
+    }
+    .hero-title em {
+      font-style: normal;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--white);
+    }
+
+    .hero-sub {
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      color: var(--grey-light);
+      margin-top: 32px;
+      max-width: 360px;
+      line-height: 1.6;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.6s forwards;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      margin-top: 48px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.8s forwards;
+    }
+
+    .btn-primary {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.25em;
+      background: var(--red);
+      color: var(--white);
+      padding: 14px 36px;
+      text-decoration: none;
+      border: none;
+      cursor: crosshair;
+      transition: background 0.2s, transform 0.2s;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+    .btn-primary:hover { background: var(--red-dark); transform: translateY(-2px); }
+
+    .btn-ghost {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.25em;
+      background: transparent;
+      color: var(--white);
+      padding: 14px 36px;
+      text-decoration: none;
+      border: 1px solid var(--grey-mid);
+      cursor: crosshair;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--white); }
+
+    /* HERO VISUAL */
+    .hero-visual {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fingerprint-ring {
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      border: 1px solid rgba(240,237,232,0.08);
+      animation: rotateRing 20s linear infinite;
+    }
+    .fingerprint-ring:nth-child(2) {
+      width: 340px; height: 340px;
+      border-color: rgba(192,22,27,0.15);
+      animation-direction: reverse;
+      animation-duration: 14s;
+    }
+    .fingerprint-ring:nth-child(3) {
+      width: 500px; height: 500px;
+      border-color: rgba(240,237,232,0.04);
+      animation-duration: 28s;
+    }
+
+    .hero-tshirt-mockup {
+      position: relative;
+      z-index: 2;
+      width: 300px;
+      opacity: 0;
+      animation: fadeIn 1s 1s forwards;
+    }
+
+    /* SVG T-shirt mockup drawn inline */
+    .tshirt-svg { width: 100%; filter: drop-shadow(0 0 60px rgba(192,22,27,0.25)); }
+
+    .crosshair-overlay {
+      position: absolute;
+      width: 120px; height: 120px;
+      z-index: 3;
+      bottom: 30%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      animation: fadeIn 1.2s 1.4s forwards;
+    }
+
+    /* ══════════════════════════════════════
+       MARQUEE
+    ══════════════════════════════════════ */
+    .marquee-section {
+      border-top: 1px solid var(--grey-mid);
+      border-bottom: 1px solid var(--grey-mid);
+      padding: 14px 0;
+      overflow: hidden;
+      background: var(--grey);
+    }
+    .marquee-track {
+      display: flex;
+      gap: 0;
+      white-space: nowrap;
+      animation: marquee 18s linear infinite;
+    }
+    .marquee-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.3em;
+      color: var(--grey-light);
+      padding: 0 48px;
+      flex-shrink: 0;
+    }
+    .marquee-item span { color: var(--red); }
+
+    /* ══════════════════════════════════════
+       COLLECTION GRID
+    ══════════════════════════════════════ */
+    .collection {
+      padding: 120px 48px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 64px;
+    }
+
+    .section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+
+    .section-link {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--grey-light);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+    .section-link:hover { color: var(--red); }
+    .section-link::after { content: '→'; }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .product-card {
+      position: relative;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      background: var(--grey);
+      cursor: crosshair;
+    }
+
+    .product-card:first-child {
+      grid-row: span 2;
+      aspect-ratio: auto;
+    }
+
+    .product-bg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .product-card:hover .product-bg { transform: scale(1.05); }
+
+    .product-tshirt {
+      width: 60%;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Graphic elements on cards */
+    .card-gfx {
+      position: absolute;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 8rem;
+      color: rgba(255,255,255,0.03);
+      letter-spacing: -0.05em;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .product-info {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 24px;
+      background: linear-gradient(transparent, rgba(5,5,5,0.95));
+      transform: translateY(60px);
+      transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .product-card:hover .product-info { transform: translateY(0); }
+
+    .product-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .product-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .product-price {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--white);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .product-add {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      padding: 8px 16px;
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.15em;
+      font-size: 0.9rem;
+      cursor: crosshair;
+      transition: background 0.2s;
+    }
+    .product-add:hover { background: var(--red-dark); }
+
+    /* Color badges */
+    .product-badge {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: var(--red);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--white);
+      padding: 4px 10px;
+      text-transform: uppercase;
+    }
+
+    /* ══════════════════════════════════════
+       PHILOSOPHY SECTION
+    ══════════════════════════════════════ */
+    .philosophy {
+      padding: 120px 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      border-top: 1px solid var(--grey-mid);
+    }
+
+    .philosophy-visual {
+      position: relative;
+      height: 500px;
+    }
+
+    .phi-box {
+      position: absolute;
+      background: var(--grey);
+      border: 1px solid var(--grey-mid);
+    }
+    .phi-box-1 { inset: 0; }
+    .phi-box-2 {
+      width: 60%; height: 60%;
+      bottom: -32px; right: -32px;
+      background: var(--grey-mid);
+      border-color: var(--red);
+    }
+
+    .phi-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .phi-fingerprint {
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      border: 1px solid rgba(240,237,232,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .phi-fingerprint::before {
+      content: '';
+      position: absolute;
+      width: 80%; height: 80%;
+      border-radius: 50%;
+      border: 1px solid rgba(192,22,27,0.4);
+      animation: pulse 3s ease-in-out infinite;
+    }
+    .phi-fingerprint::after {
+      content: '';
+      position: absolute;
+      width: 60%; height: 60%;
+      border-radius: 50%;
+      border: 1px solid rgba(240,237,232,0.1);
+      animation: pulse 3s 1.5s ease-in-out infinite;
+    }
+
+    .phi-inner-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3rem;
+      letter-spacing: 0.1em;
+      color: var(--red);
+      z-index: 1;
+    }
+
+    .philosophy-content .section-label { margin-bottom: 16px; }
+
+    .philosophy-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      letter-spacing: 0.05em;
+      line-height: 1.05;
+      margin-bottom: 32px;
+    }
+    .philosophy-heading em {
+      font-style: normal;
+      color: var(--red);
+    }
+
+    .philosophy-body {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--grey-light);
+      line-height: 1.7;
+      letter-spacing: 0.05em;
+      margin-bottom: 24px;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 48px;
+      margin-top: 48px;
+      padding-top: 48px;
+      border-top: 1px solid var(--grey-mid);
+    }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      color: var(--red);
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      color: var(--grey-light);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* ══════════════════════════════════════
+       DROP SECTION
+    ══════════════════════════════════════ */
+    .drop-section {
+      padding: 100px 48px;
+      background: var(--grey);
+      border-top: 1px solid var(--grey-mid);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .drop-section::before {
+      content: 'DROP';
+      position: absolute;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20rem;
+      color: rgba(192,22,27,0.04);
+      letter-spacing: -0.05em;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .drop-eyebrow {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .drop-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 7vw, 6rem);
+      letter-spacing: 0.05em;
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    .drop-sub {
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      color: var(--grey-light);
+      margin-bottom: 48px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .email-form {
+      display: flex;
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .email-input {
+      flex: 1;
+      background: var(--black);
+      border: 1px solid var(--grey-mid);
+      border-right: none;
+      color: var(--white);
+      padding: 14px 20px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .email-input::placeholder { color: var(--grey-light); }
+    .email-input:focus { border-color: var(--red); }
+
+    .email-btn {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      padding: 14px 28px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      cursor: crosshair;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .email-btn:hover { background: var(--red-dark); }
+
+    /* ══════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════ */
+    footer {
+      padding: 80px 48px 40px;
+      border-top: 1px solid var(--grey-mid);
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+    }
+
+    .footer-brand .nav-logo {
+      font-size: 1.8rem;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    .footer-desc {
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: var(--grey-light);
+      line-height: 1.7;
+      letter-spacing: 0.05em;
+      max-width: 280px;
+    }
+
+    .footer-col-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 12px; }
+    .footer-links a {
+      font-size: 0.85rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      color: var(--grey-light);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--white); }
+
+    .footer-bottom {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 40px;
+      border-top: 1px solid var(--grey-mid);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--grey-light);
+      text-transform: uppercase;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 24px;
+    }
+    .social-links a {
+      color: var(--grey-light);
+      text-decoration: none;
+      transition: color 0.2s;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+    }
+    .social-links a:hover { color: var(--red); }
+
+    /* ══════════════════════════════════════
+       ANIMATIONS
+    ══════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    @keyframes rotateRing {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* ══════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════ */
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-text { padding: 120px 24px 60px; }
+      .hero-visual { height: 50vh; }
+      .fingerprint-ring { width: 260px; height: 260px; }
+      .fingerprint-ring:nth-child(2) { width: 200px; height: 200px; }
+      .fingerprint-ring:nth-child(3) { width: 320px; height: 320px; }
+      .hero-tshirt-mockup { width: 180px; }
+
+      .collection { padding: 80px 24px; }
+      .product-grid { grid-template-columns: 1fr; }
+      .product-card:first-child { grid-row: auto; aspect-ratio: 3/4; }
+
+      .philosophy { grid-template-columns: 1fr; padding: 80px 24px; }
+      .philosophy-visual { height: 300px; }
+
+      .drop-section { padding: 80px 24px; }
+      .email-form { flex-direction: column; }
+      .email-input { border-right: 1px solid var(--grey-mid); border-bottom: none; }
+
+      footer { grid-template-columns: 1fr 1fr; padding: 60px 24px 32px; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ NAV ══ -->
+  <nav>
+    <a href="#" class="nav-logo">TURV<span>I</span>SION</a>
+    <ul class="nav-links">
+      <li><a href="#collection">Colección</a></li>
+      <li><a href="#drops">Drops</a></li>
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <a href="#" class="nav-cart">[ CARRITO 0 ]</a>
+  </nav>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero">
+    <div class="hero-text">
+      <p class="hero-eyebrow">// SS2026 — COLLECTION ONE</p>
+      <h1 class="hero-title">
+        SEE<br/><em>BE</em><br/>YOND
+      </h1>
+      <p class="hero-sub">
+        No somos ropa. Somos una señal de que miras más allá de lo que te muestran. Ropa hecha para los que no encajan.
+      </p>
+      <div class="hero-ctas">
+        <a href="#collection" class="btn-primary">Ver Colección</a>
+        <a href="#drops" class="btn-ghost">Próximo Drop</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="fingerprint-ring"></div>
+      <div class="fingerprint-ring"></div>
+      <div class="fingerprint-ring"></div>
+
+      <!-- SVG T-shirt with fingerprint graphic -->
+      <div class="hero-tshirt-mockup">
+        <svg class="tshirt-svg" viewBox="0 0 300 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- T-shirt body -->
+          <path d="M60 60 L0 120 L50 150 L50 320 L250 320 L250 150 L300 120 L240 60 L205 80 C190 20 110 20 95 80 Z" fill="#0d0d0d" stroke="#2e2e2e" stroke-width="1"/>
+          <!-- Collar -->
+          <path d="M95 80 C110 110 190 110 205 80" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+          <!-- Fingerprint circle -->
+          <circle cx="150" cy="165" r="65" fill="none" stroke="rgba(240,237,232,0.5)" stroke-width="1.5"/>
+          <circle cx="150" cy="165" r="55" fill="none" stroke="rgba(240,237,232,0.3)" stroke-width="1"/>
+          <circle cx="150" cy="165" r="45" fill="none" stroke="rgba(240,237,232,0.2)" stroke-width="0.8"/>
+          <circle cx="150" cy="165" r="35" fill="none" stroke="rgba(240,237,232,0.15)" stroke-width="0.8"/>
+          <circle cx="150" cy="165" r="22" fill="none" stroke="rgba(240,237,232,0.1)" stroke-width="0.8"/>
+          <!-- Crosshair in red -->
+          <circle cx="150" cy="200" r="28" fill="none" stroke="#c0161b" stroke-width="2"/>
+          <line x1="150" y1="168" x2="150" y2="228" stroke="#c0161b" stroke-width="2"/>
+          <line x1="118" y1="200" x2="182" y2="200" stroke="#c0161b" stroke-width="2"/>
+          <!-- Drip -->
+          <path d="M155 228 Q160 240 158 252 Q156 264 160 270" stroke="#c0161b" stroke-width="1.5" fill="none"/>
+          <!-- Brand text -->
+          <text x="150" y="295" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="18" fill="rgba(240,237,232,0.7)" letter-spacing="6">TURVISION</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MARQUEE ══ -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <span class="marquee-item">TURVISION <span>◎</span></span>
+      <span class="marquee-item">SEE BEYOND <span>◎</span></span>
+      <span class="marquee-item">STREETWEAR <span>◎</span></span>
+      <span class="marquee-item">DROP SS2026 <span>◎</span></span>
+      <span class="marquee-item">COLECCIÓN 01 <span>◎</span></span>
+      <span class="marquee-item">NO ENCAJES <span>◎</span></span>
+      <span class="marquee-item">TURVISION <span>◎</span></span>
+      <span class="marquee-item">SEE BEYOND <span>◎</span></span>
+      <span class="marquee-item">STREETWEAR <span>◎</span></span>
+      <span class="marquee-item">DROP SS2026 <span>◎</span></span>
+      <span class="marquee-item">COLECCIÓN 01 <span>◎</span></span>
+      <span class="marquee-item">NO ENCAJES <span>◎</span></span>
+    </div>
+  </div>
+
+  <!-- ══ COLLECTION ══ -->
+  <section class="collection" id="collection">
+    <div class="section-header">
+      <div>
+        <p class="section-label">// 001 — PRENDAS</p>
+        <h2 class="section-title">COLECCIÓN<br/>SS2026</h2>
+      </div>
+      <a href="#" class="section-link">Ver todo</a>
+    </div>
+
+    <div class="product-grid">
+      <!-- Card 1 – LARGE -->
+      <div class="product-card">
+        <div class="product-bg">
+          <div class="card-gfx" style="top:10%;left:5%">RV</div>
+          <svg class="product-tshirt" viewBox="0 0 300 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M60 60 L0 120 L50 150 L50 320 L250 320 L250 150 L300 120 L240 60 L205 80 C190 20 110 20 95 80 Z" fill="#111" stroke="#2e2e2e" stroke-width="1"/>
+            <circle cx="150" cy="160" r="70" fill="none" stroke="rgba(240,237,232,0.4)" stroke-width="1.5"/>
+            <circle cx="150" cy="160" r="55" fill="none" stroke="rgba(240,237,232,0.25)" stroke-width="1"/>
+            <circle cx="150" cy="160" r="40" fill="none" stroke="rgba(240,237,232,0.15)" stroke-width="0.8"/>
+            <circle cx="150" cy="160" r="25" fill="none" stroke="rgba(240,237,232,0.1)" stroke-width="0.8"/>
+            <circle cx="150" cy="195" r="30" fill="none" stroke="#c0161b" stroke-width="2.5"/>
+            <line x1="150" y1="161" x2="150" y2="225" stroke="#c0161b" stroke-width="2.5"/>
+            <line x1="116" y1="195" x2="184" y2="195" stroke="#c0161b" stroke-width="2.5"/>
+            <path d="M155 225 Q162 244 160 260" stroke="#c0161b" stroke-width="2" fill="none"/>
+            <text x="150" y="295" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="20" fill="rgba(240,237,232,0.8)" letter-spacing="8">TURVISION</text>
+          </svg>
+        </div>
+        <span class="product-badge">NUEVO</span>
+        <div class="product-info">
+          <p class="product-tag">// SIGNATURE</p>
+          <h3 class="product-name">CROSSHAIR TEE</h3>
+          <div class="product-price">
+            <span>$45.000</span>
+            <button class="product-add">+ ADD</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="product-card">
+        <div class="product-bg" style="background:#111;">
+          <div class="card-gfx" style="bottom:-20px;right:-10px;font-size:6rem;opacity:0.05">01</div>
+          <svg class="product-tshirt" viewBox="0 0 300 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M60 60 L0 120 L50 150 L50 320 L250 320 L250 150 L300 120 L240 60 L205 80 C190 20 110 20 95 80 Z" fill="#0d0d0d" stroke="#1a1a1a" stroke-width="1"/>
+            <text x="150" y="195" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="56" fill="rgba(240,237,232,0.12)" letter-spacing="-2">TURVISION</text>
+            <text x="150" y="225" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="22" fill="rgba(240,237,232,0.6)" letter-spacing="8">TURVISION</text>
+          </svg>
+        </div>
+        <div class="product-info">
+          <p class="product-tag">// ESENCIALS</p>
+          <h3 class="product-name">LOGO GHOST TEE</h3>
+          <div class="product-price">
+            <span>$38.000</span>
+            <button class="product-add">+ ADD</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="product-card">
+        <div class="product-bg" style="background:#0a0a0a;">
+          <div class="card-gfx" style="top:20%;left:20%;color:rgba(192,22,27,0.08)">◎</div>
+          <svg class="product-tshirt" viewBox="0 0 300 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M60 60 L0 120 L50 150 L50 320 L250 320 L250 150 L300 120 L240 60 L205 80 C190 20 110 20 95 80 Z" fill="#0d0d0d" stroke="#2e2e2e" stroke-width="1"/>
+            <circle cx="150" cy="175" r="50" fill="none" stroke="rgba(192,22,27,0.6)" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <circle cx="150" cy="175" r="35" fill="none" stroke="rgba(192,22,27,0.3)" stroke-width="1"/>
+            <text x="150" y="182" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="24" fill="rgba(240,237,232,0.7)" letter-spacing="4">RV</text>
+            <text x="150" y="270" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="14" fill="rgba(240,237,232,0.4)" letter-spacing="12">SEE BEYOND</text>
+          </svg>
+        </div>
+        <div class="product-info">
+          <p class="product-tag">// LIMITED</p>
+          <h3 class="product-name">SIGNAL TEE</h3>
+          <div class="product-price">
+            <span>$48.000</span>
+            <button class="product-add">+ ADD</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="product-card">
+        <div class="product-bg" style="background:#0d0d0d;">
+          <svg class="product-tshirt" viewBox="0 0 300 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Hoodie shape -->
+            <path d="M55 80 L0 140 L50 170 L50 360 L250 360 L250 170 L300 140 L245 80 L210 95 C200 40 100 40 90 95 Z" fill="#0d0d0d" stroke="#2e2e2e" stroke-width="1"/>
+            <path d="M90 95 C100 130 200 130 210 95" fill="#111" stroke="#1a1a1a" stroke-width="1"/>
+            <!-- Pouch pocket -->
+            <path d="M95 240 L205 240 L205 290 L95 290 Z" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+            <text x="150" y="190" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="16" fill="rgba(192,22,27,0.9)" letter-spacing="6">TURVISION</text>
+            <circle cx="150" cy="170" r="22" fill="none" stroke="rgba(192,22,27,0.5)" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <span class="product-badge">PRONTO</span>
+        <div class="product-info">
+          <p class="product-tag">// HOODIE</p>
+          <h3 class="product-name">TACTICAL HOODIE</h3>
+          <div class="product-price">
+            <span>$85.000</span>
+            <button class="product-add">PRONTO</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PHILOSOPHY ══ -->
+  <section class="philosophy" id="nosotros">
+    <div class="philosophy-visual">
+      <div class="phi-box phi-box-1"></div>
+      <div class="phi-box phi-box-2"></div>
+      <div class="phi-center">
+        <div class="phi-fingerprint">
+          <span class="phi-inner-text">TRV</span>
+        </div>
+      </div>
+    </div>
+    <div class="philosophy-content">
+      <p class="section-label">// QUIÉNES SOMOS</p>
+      <h2 class="philosophy-heading">
+        CREADOS PARA<br/>
+        LOS QUE <em>VEN</em><br/>
+        MÁS ALLÁ
+      </h2>
+      <p class="philosophy-body">
+        TURVISION nació en la calle, para la calle. Cada prenda es una declaración de identidad — para quienes rechazan la superficialidad y buscan algo más profundo en lo que visten.
+      </p>
+      <p class="philosophy-body">
+        Diseños minimalistas con significado máximo. La huella dactilar es tu identidad. La mira es tu enfoque. Juntos, forman la visión que nos define.
+      </p>
+      <div class="stats-row">
+        <div>
+          <p class="stat-num">01</p>
+          <p class="stat-label">Colección activa</p>
+        </div>
+        <div>
+          <p class="stat-num">100%</p>
+          <p class="stat-label">Algodón premium</p>
+        </div>
+        <div>
+          <p class="stat-num">∞</p>
+          <p class="stat-label">Identidad propia</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ DROPS ══ -->
+  <section class="drop-section" id="drops">
+    <p class="drop-eyebrow">// PRÓXIMO DROP — SS2026</p>
+    <h2 class="drop-title">ÚNETE<br/>AL DROP</h2>
+    <p class="drop-sub">
+      Sé el primero en saber cuándo cae la siguiente colección. Stock limitado. Sin second chances.
+    </p>
+    <div class="email-form">
+      <input type="email" class="email-input" placeholder="tu@email.com" />
+      <button class="email-btn">NOTIFICARME</button>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer id="contacto">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">TURV<span>I</span>SION</a>
+      <p class="footer-desc">
+        Ropa para los que miran diferente. Identidad sobre estética. Calle sobre todo.
+      </p>
+    </div>
+    <div>
+      <p class="footer-col-title">// Navegación</p>
+      <ul class="footer-links">
+        <li><a href="#collection">Colección</a></li>
+        <li><a href="#drops">Drops</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#">Guía de tallas</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">// Soporte</p>
+      <ul class="footer-links">
+        <li><a href="#">Envíos</a></li>
+        <li><a href="#">Devoluciones</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Contacto</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">// Legal</p>
+      <ul class="footer-links">
+        <li><a href="#">Términos</a></li>
+        <li><a href="#">Privacidad</a></li>
+        <li><a href="#">Cookies</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 TURVISION — All rights reserved</span>
+      <div class="social-links">
+        <a href="#">INSTAGRAM</a>
+        <a href="#">TIKTOK</a>
+        <a href="#">WHATSAPP</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth hover on product cards – reveal info from bottom
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('mouseenter', () => card.classList.add('hovered'));
+      card.addEventListener('mouseleave', () => card.classList.remove('hovered'));
+    });
+
+    // Email notify placeholder feedback
+    document.querySelector('.email-btn').addEventListener('click', () => {
+      const input = document.querySelector('.email-input');
+      if (input.value.includes('@')) {
+        input.value = '';
+        input.placeholder = '✓ ¡Te avisamos en el próximo drop!';
+        setTimeout(() => input.placeholder = 'tu@email.com', 3500);
+      } else {
+        input.style.borderColor = '#c0161b';
+        setTimeout(() => input.style.borderColor = '', 1500);
+      }
+    });
+
+    // Intersection observer for fade-in on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.style.opacity = '1';
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.product-card, .philosophy-visual, .drop-section').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
